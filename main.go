@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/yigarashi-9/twtidy/model"
+	"github.com/yigarashi-9/twtidy/relation"
 	"github.com/yigarashi-9/twtidy/repository"
 	"github.com/yigarashi-9/twtidy/service"
 )
@@ -28,7 +29,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to find all followings: %s", err.Error())
 		return
 	}
-	followingsWithTweets, err := service.Users(followings).ToTweets(svc)
+	followingsWithTweets, err := relation.Users(followings).ToTweets(repo)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to find first tweets: %s", err.Error())
 		return
