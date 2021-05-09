@@ -18,3 +18,9 @@ type Tweet struct {
 	ID        ID        `json:"id"`
 	Text      string    `json:"text"`
 }
+
+// IsMoreThan72HoursOld ...
+func (t *Tweet) IsMoreThan72HoursOld() bool {
+    duration, _ := time.ParseDuration("-72h")
+    return t.CreatedAt.Before(time.Now().Add(duration))
+}

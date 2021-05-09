@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/yigarashi-9/twtidy/model"
 	"github.com/yigarashi-9/twtidy/repository"
@@ -39,8 +38,7 @@ func main() {
 		followingsMap[u.ID] = u
 	}
 	for userID, tweet := range userIDToFirstTweet {
-		duration, _ := time.ParseDuration("-72h")
-		if tweet.CreatedAt.Before(time.Now().Add(duration)) {
+		if tweet.IsMoreThan72HoursOld() {
 			fmt.Fprintf(os.Stdout, "https://twitter.com/%v\n", followingsMap[userID].Username)
 		}
 	}
