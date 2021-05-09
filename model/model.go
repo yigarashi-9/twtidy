@@ -12,6 +12,17 @@ type User struct {
 	Username string `json:"username"`
 }
 
+// UserWithRecentTweets ...
+type UserWithRecentTweets struct {
+	User
+	RecentTweets []Tweet
+}
+
+// IsPassiveUser ...
+func (u *UserWithRecentTweets) IsPassiveUser() bool {
+    return len(u.RecentTweets) > 0 && u.RecentTweets[0].IsMoreThan72HoursOld()
+}
+
 // Tweet ...
 type Tweet struct {
 	CreatedAt time.Time `json:"created_at"`

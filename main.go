@@ -28,18 +28,15 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Failed to find all followings: %s", err.Error())
 		return
 	}
-	userIDToFirstTweet, err := svc.FindFirstTweets(followings)
+	followingsWithTweets, err := service.Users(followings).ToTweets(svc)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to find first tweets: %s", err.Error())
 		return
 	}
-	followingsMap := make(map[model.ID]model.User)
-	for _, u := range followings {
-		followingsMap[u.ID] = u
-	}
-	for userID, tweet := range userIDToFirstTweet {
-		if tweet.IsMoreThan72HoursOld() {
-			fmt.Fprintf(os.Stdout, "https://twitter.com/%v\n", followingsMap[userID].Username)
+
+	for _, userWithTweet := range followingsWithTweets {
+		if userWithTweet.IsPassiveUser() {
+			fmt.Fprintf(os.Stdout, "https://twitter.com/%v\n", userWithTweet.Username)
 		}
 	}
 	return

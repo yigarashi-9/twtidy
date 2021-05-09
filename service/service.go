@@ -55,13 +55,19 @@ func (s *Service) FindAllFollowings() ([]model.User, error) {
 	return followings, nil
 }
 
-// FindFirstTweets ...
-func (s *Service) FindFirstTweets(users []model.User) (map[model.ID]model.Tweet, error) {
+// Users ...
+type Users []model.User
+
+// ToTweets ...
+func (us Users) ToTweets(s *Service) ([]model.UserWithRecentTweets, error) {
+	users := ([]model.User)(us)
+
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	sem := semaphore.NewWeighted(int64(runtime.NumCPU()))
 	ctx := context.TODO()
-	userIDToFirstTweet := make(map[model.ID]model.Tweet)
+	usersWithTweets := make([]model.UserWithRecentTweets, len(users))
+
 	for _, user := range users {
 		user := user
 		wg.Add(1)
@@ -69,12 +75,15 @@ func (s *Service) FindFirstTweets(users []model.User) (map[model.ID]model.Tweet,
 		go func() {
 			tweets, _ := s.repo.FetchRecentTweets(user.ID)
 			mu.Lock()
-			userIDToFirstTweet[user.ID] = tweets[0]
+			usersWithTweets = append(usersWithTweets, model.UserWithRecentTweets{
+				User:         user,
+				RecentTweets: tweets,
+			})
 			mu.Unlock()
 			wg.Done()
 			sem.Release(1)
 		}()
 	}
 	wg.Wait()
-	return userIDToFirstTweet, nil
+	return usersWithTweets, nil
 }
