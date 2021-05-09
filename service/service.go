@@ -1,7 +1,12 @@
 package service
 
 import (
+	"context"
+	"runtime"
+	"sync"
 	"time"
+
+	"golang.org/x/sync/semaphore"
 
 	"github.com/yigarashi-9/twtidy/model"
 	"github.com/yigarashi-9/twtidy/repository"
@@ -52,13 +57,24 @@ func (s *Service) FindAllFollowings() ([]model.User, error) {
 
 // FindFirstTweets ...
 func (s *Service) FindFirstTweets(users []model.User) (map[model.ID]model.Tweet, error) {
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	sem := semaphore.NewWeighted(int64(runtime.NumCPU()))
+	ctx := context.TODO()
 	userIDToFirstTweet := make(map[model.ID]model.Tweet)
 	for _, user := range users {
-		tweets, err := s.repo.FetchRecentTweets(user.ID)
-		if err != nil {
-			return nil, err
-		}
-		userIDToFirstTweet[user.ID] = tweets[0]
+		user := user
+		wg.Add(1)
+		sem.Acquire(ctx, 1)
+		go func() {
+			tweets, _ := s.repo.FetchRecentTweets(user.ID)
+			mu.Lock()
+			userIDToFirstTweet[user.ID] = tweets[0]
+			mu.Unlock()
+			wg.Done()
+			sem.Release(1)
+		}()
 	}
+	wg.Wait()
 	return userIDToFirstTweet, nil
 }
