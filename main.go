@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/yigarashi-9/twtidy/infrastructure"
 	"github.com/yigarashi-9/twtidy/model"
 	"github.com/yigarashi-9/twtidy/relation"
-	"github.com/yigarashi-9/twtidy/repository"
 	"github.com/yigarashi-9/twtidy/service"
 )
 
@@ -21,15 +21,15 @@ func main() {
 		fmt.Fprintf(os.Stderr, "TWITTER_USER_ID should be exported")
 		return
 	}
-	repo := repository.New(bearerToken, model.ID(userID))
-	svc := service.New(repo)
+	repoImpl := infrastructure.New(bearerToken, model.ID(userID))
+	svc := service.New(repoImpl)
 
 	followings, err := svc.FindAllFollowings()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to find all followings: %s", err.Error())
 		return
 	}
-	followingsWithTweets, err := relation.Users(followings).ToTweets(repo)
+	followingsWithTweets, err := relation.Users(followings).ToTweets(repoImpl)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to find first tweets: %s", err.Error())
 		return

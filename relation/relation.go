@@ -15,7 +15,7 @@ import (
 type Users []model.User
 
 // ToTweets ...
-func (us Users) ToTweets(repo *repository.Repository) ([]model.UserWithRecentTweets, error) {
+func (us Users) ToTweets(repo repository.Repository) ([]model.UserWithRecentTweets, error) {
 	users := ([]model.User)(us)
 
 	var mu sync.Mutex
