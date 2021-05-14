@@ -22,7 +22,7 @@ func (us Users) ToTweets(repo repository.Repository) ([]model.UserWithRecentTwee
 	var wg sync.WaitGroup
 	sem := semaphore.NewWeighted(int64(runtime.NumCPU()))
 	ctx := context.TODO()
-	usersWithTweets := make([]model.UserWithRecentTweets, len(users))
+	usersWithTweets := make([]model.UserWithRecentTweets, 0, len(users))
 
 	for _, user := range users {
 		user := user

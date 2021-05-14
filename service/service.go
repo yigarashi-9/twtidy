@@ -30,7 +30,7 @@ func (s *Service) FindAllFollowings() ([]model.User, error) {
 	}
 
 	paginationToken := ""
-	followings := make([]model.User, 0)
+	followings := make([]model.User, 0, 100)
 	for {
 		resp, err := s.repo.FetchFollowings(paginationToken)
 		if err != nil {
