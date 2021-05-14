@@ -86,6 +86,7 @@ func _cacheFilePath() string {
 	u, _ := user.Current()
 	return strings.Join([]string{u.HomeDir, ".twtidy.json"}, "/")
 }
+
 var cacheFilePath = _cacheFilePath()
 
 // LoadFollowingsFromCache ...
