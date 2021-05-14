@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"time"
+	"unicode/utf8"
+)
 
 // ID ...
 type ID string
@@ -20,7 +23,15 @@ type UserWithRecentTweets struct {
 
 // IsPassiveUser ...
 func (u *UserWithRecentTweets) IsPassiveUser() bool {
-	return len(u.RecentTweets) > 0 && u.RecentTweets[0].IsMoreThan72HoursOld()
+	if len(u.RecentTweets) == 0 {
+		return true
+	}
+	sum := 0
+	for _, t := range u.RecentTweets {
+		sum += t.TweetLength()
+	}
+	ave := sum / len(u.RecentTweets)
+	return ave <= 20 || u.RecentTweets[0].IsMoreThan72HoursOld()
 }
 
 // Tweet ...
@@ -34,4 +45,9 @@ type Tweet struct {
 func (t *Tweet) IsMoreThan72HoursOld() bool {
 	duration, _ := time.ParseDuration("-72h")
 	return t.CreatedAt.Before(time.Now().Add(duration))
+}
+
+// TweetLength ...
+func (t *Tweet) TweetLength() int {
+	return utf8.RuneCountInString(t.Text)
 }
