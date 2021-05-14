@@ -20,7 +20,7 @@ type UserWithRecentTweets struct {
 
 // IsPassiveUser ...
 func (u *UserWithRecentTweets) IsPassiveUser() bool {
-    return len(u.RecentTweets) > 0 && u.RecentTweets[0].IsMoreThan72HoursOld()
+	return len(u.RecentTweets) > 0 && u.RecentTweets[0].IsMoreThan72HoursOld()
 }
 
 // Tweet ...
@@ -32,6 +32,6 @@ type Tweet struct {
 
 // IsMoreThan72HoursOld ...
 func (t *Tweet) IsMoreThan72HoursOld() bool {
-    duration, _ := time.ParseDuration("-72h")
-    return t.CreatedAt.Before(time.Now().Add(duration))
+	duration, _ := time.ParseDuration("-72h")
+	return t.CreatedAt.Before(time.Now().Add(duration))
 }
